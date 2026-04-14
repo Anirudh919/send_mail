@@ -8,6 +8,7 @@ const sendBulkEmails = async (req, res) => {
     const recipientsFile = req.files?.recipients?.[0];
     const messageFile = req.files?.messageFormat?.[0];
     const attachmentFiles = req.files?.attachments || [];
+    const manualSubject = req.body.subject;
 
     if (!recipientsFile || !messageFile) {
       return res.status(400).json({ error: "Excel or Message file missing" });
@@ -35,6 +36,10 @@ const sendBulkEmails = async (req, res) => {
 
     // 📌 Extract subject ONLY from first line
     let subject = "No Subject";
+
+    if (manualSubject && manualSubject.trim() !== "") {
+      subject = manualSubject.trim();
+    }
 
     if (lines[0]?.toLowerCase().startsWith("subject")) {
       subject = lines[0]
