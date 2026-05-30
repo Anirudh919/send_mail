@@ -2,6 +2,7 @@ const nodemailer = require("nodemailer");
 const mammoth = require("mammoth");
 const { htmlToText } = require("html-to-text");
 const parseExcelFile = require("../utils/excelParsar.js");
+const path = require("path");
 
 const sendBulkEmails = async (req, res) => {
   try {
@@ -80,9 +81,19 @@ const sendBulkEmails = async (req, res) => {
           from: `${process.env.FROM_NAME} <${process.env.EMAIL_USER}>`,
           to: user.email,
           subject,
-          html: personalizedHtml,
+          html: personalizedHtml + `
+    <br/><br/>
+    <img src="cid:signatureImage" style="width:500px; max-width:100%;" />
+  `,
           text: htmlToText(personalizedHtml),
-          attachments
+          attachments: [
+            ...attachments,
+            {
+              filename: "signature.jpg",
+              path: path.join(__dirname, "../assets/signature.jpeg"),
+              cid: "signatureImage"
+            }
+          ]
         });
 
         success++;
